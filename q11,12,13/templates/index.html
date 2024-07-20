@@ -1,0 +1,38 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask WebSocket Notifications</title>
+</head>
+<body>
+    <h1>Flask WebSocket Notifications</h1>
+    <form id="messageForm">
+        <input type="text" id="messageInput" placeholder="Type a message">
+        <button type="submit">Send</button>
+    </form>
+    <ul id="notificationList"></ul>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+            socket.on('notification', function (data) {
+                var notificationList = document.getElementById('notificationList');
+                var listItem = document.createElement('li');
+                listItem.textContent = data.data;
+                notificationList.appendChild(listItem);
+            });
+
+            document.getElementById('messageForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+                var messageInput = document.getElementById('messageInput');
+                socket.emit('message', messageInput.value);
+                messageInput.value = '';
+            });
+        });
+    </script>
+</body>
+</html>
